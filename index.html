@@ -1,1 +1,763 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#075e5b">
+<title>မြန်မာအသံ — AI Video Dubbing</title>
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+Myanmar:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box}
+
+:root{
+  --teal:#075e5b;
+  --teal2:#0b7772;
+  --sand:#f7f1e7;
+  --card:#fffdf9;
+  --gold:#d69b32;
+  --text:#183331;
+  --muted:#70807d;
+  --line:#e6dfd3;
+  --danger:#b83b3b;
+  --shadow:0 10px 30px rgba(30,55,50,.08);
+}
+
+body{
+  margin:0;
+  background:var(--sand);
+  color:var(--text);
+  font-family:"Noto Sans Myanmar","Manrope",sans-serif;
+}
+
+.container{
+  width:min(980px,calc(100% - 28px));
+  margin:auto;
+}
+
+header{
+  padding:30px 0 20px;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:13px;
+}
+
+.logo{
+  width:50px;
+  height:50px;
+  border-radius:16px;
+  background:var(--teal);
+  color:white;
+  display:grid;
+  place-items:center;
+  font-size:25px;
+  box-shadow:var(--shadow);
+}
+
+h1{
+  margin:0;
+  font-size:28px;
+  font-weight:800;
+}
+
+.subtitle{
+  margin:3px 0 0;
+  color:var(--muted);
+  font-size:14px;
+}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:20px;
+  margin:16px 0;
+  box-shadow:var(--shadow);
+}
+
+.card h2{
+  margin:0 0 15px;
+  font-size:18px;
+}
+
+.tabs{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin-bottom:15px;
+}
+
+.tab{
+  border:1px solid var(--line);
+  background:white;
+  border-radius:12px;
+  min-height:48px;
+  padding:8px;
+  font-family:inherit;
+  cursor:pointer;
+  color:var(--text);
+}
+
+.tab.active{
+  background:var(--teal);
+  color:white;
+  border-color:var(--teal);
+}
+
+.drop{
+  border:2px dashed #c9c0b1;
+  border-radius:18px;
+  padding:32px 15px;
+  text-align:center;
+  cursor:pointer;
+  background:#fffaf2;
+}
+
+.drop strong{
+  display:block;
+  font-size:17px;
+  margin-bottom:5px;
+}
+
+.drop small{
+  color:var(--muted);
+}
+
+input[type=file]{display:none}
+
+.preview{
+  display:none;
+  margin-top:15px;
+}
+
+video{
+  width:100%;
+  max-height:430px;
+  background:#111;
+  border-radius:15px;
+}
+
+.fileinfo{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:center;
+  padding-top:10px;
+  font-size:13px;
+}
+
+textarea{
+  width:100%;
+  min-height:160px;
+  resize:vertical;
+  border:1px solid var(--line);
+  border-radius:15px;
+  padding:15px;
+  font-family:inherit;
+  font-size:16px;
+  outline:none;
+  background:white;
+}
+
+textarea:focus{
+  border-color:var(--teal);
+}
+
+.hint{
+  color:var(--muted);
+  font-size:13px;
+  margin-top:7px;
+}
+
+.narrators{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+}
+
+.voice{
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:13px 8px;
+  text-align:center;
+  background:white;
+  cursor:pointer;
+  transition:.15s;
+}
+
+.voice:hover{
+  transform:translateY(-2px);
+}
+
+.voice.selected{
+  border:2px solid var(--teal);
+  background:#eef8f6;
+}
+
+.avatar{
+  width:48px;
+  height:48px;
+  border-radius:50%;
+  margin:auto auto 8px;
+  display:grid;
+  place-items:center;
+  background:#e9dfcf;
+  font-size:22px;
+}
+
+.voice b{
+  display:block;
+  font-size:14px;
+}
+
+.voice span{
+  color:var(--muted);
+  font-size:11px;
+}
+
+.voice button{
+  margin-top:8px;
+  border:0;
+  background:#f1ece3;
+  padding:7px 10px;
+  border-radius:9px;
+  font-family:inherit;
+  cursor:pointer;
+}
+
+details{
+  border-top:1px solid var(--line);
+  padding-top:15px;
+}
+
+summary{
+  cursor:pointer;
+  font-weight:600;
+}
+
+.control{
+  margin:15px 0;
+}
+
+.control label{
+  display:flex;
+  justify-content:space-between;
+  font-size:14px;
+}
+
+input[type=range]{
+  width:100%;
+  accent-color:var(--teal);
+}
+
+.primary{
+  width:100%;
+  min-height:56px;
+  border:0;
+  border-radius:16px;
+  background:var(--teal);
+  color:white;
+  font-family:inherit;
+  font-size:17px;
+  font-weight:700;
+  cursor:pointer;
+  box-shadow:0 8px 20px rgba(7,94,91,.2);
+}
+
+.primary:active{
+  transform:scale(.99);
+}
+
+.secondary{
+  border:1px solid var(--line);
+  background:white;
+  border-radius:12px;
+  padding:10px 14px;
+  font-family:inherit;
+  cursor:pointer;
+}
+
+.progressbox{
+  display:none;
+}
+
+.progress{
+  height:12px;
+  background:#e7e2d9;
+  border-radius:99px;
+  overflow:hidden;
+}
+
+.progressbar{
+  height:100%;
+  width:0%;
+  background:var(--teal);
+  transition:width .4s;
+}
+
+.steps{
+  list-style:none;
+  padding:0;
+  margin:18px 0 0;
+}
+
+.steps li{
+  padding:9px 0;
+  color:#89938f;
+}
+
+.steps li.active{
+  color:var(--teal);
+  font-weight:700;
+}
+
+.steps li.done{
+  color:#438b68;
+}
+
+.result{
+  display:none;
+}
+
+.success{
+  font-size:20px;
+  font-weight:800;
+  color:#287a57;
+}
+
+.downloads{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+  margin-top:12px;
+}
+
+.download{
+  min-height:48px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:white;
+  font-family:inherit;
+  cursor:pointer;
+}
+
+.status{
+  padding:12px;
+  border-radius:12px;
+  background:#edf7f5;
+  color:var(--teal);
+  margin-top:12px;
+  display:none;
+}
+
+@media(max-width:650px){
+  .container{width:min(100% - 20px,980px)}
+  header{padding-top:20px}
+  h1{font-size:23px}
+  .card{padding:15px;border-radius:17px}
+  .narrators{grid-template-columns:repeat(2,1fr)}
+  .tabs{grid-template-columns:1fr}
+  .downloads{grid-template-columns:1fr}
+}
+
+@media(min-width:651px){
+  .sticky{
+    position:sticky;
+    bottom:12px;
+    z-index:5;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+  <div class="brand">
+    <div class="logo">အသံ</div>
+    <div>
+      <h1>မြန်မာအသံ</h1>
+      <div class="subtitle">AI ဖြင့် Video ကို မြန်မာအသံပြောင်းပါ</div>
+    </div>
+  </div>
+</header>
+
+<!-- VIDEO -->
+<section class="card">
+  <h2>🎬 Video ထည့်ပါ</h2>
+
+  <div class="tabs">
+    <button class="tab active" onclick="tab('file',this)">📁 ဖုန်းထဲမှ Video</button>
+    <button class="tab" onclick="tab('url',this)">🔗 Video Link</button>
+    <button class="tab" onclick="tab('text',this)">📝 မြန်မာစာ</button>
+  </div>
+
+  <div id="fileTab">
+    <label class="drop" for="videoFile">
+      <strong>📤 Video ရွေးရန်</strong>
+      <small>MP4 / MOV / WebM • ဖုန်းမှရွေးနိုင်ပါတယ်</small>
+    </label>
+    <input id="videoFile" type="file" accept="video/mp4,video/webm,video/quicktime">
+
+    <div class="preview" id="videoPreview">
+      <video id="video" controls></video>
+      <div class="fileinfo">
+        <span id="fileName">Video</span>
+        <span id="fileSize"></span>
+      </div>
+      <button class="secondary" onclick="removeVideo()">✕ Video ဖယ်မည်</button>
+    </div>
+  </div>
+
+  <div id="urlTab" style="display:none">
+    <input id="videoUrl" type="url"
+      placeholder="Direct video link ထည့်ပါ"
+      style="width:100%;padding:15px;border:1px solid var(--line);border-radius:14px;font-family:inherit;font-size:15px">
+    <p class="hint">YouTube / TikTok / Facebook link များကို v1 တွင် မထောက်ပံ့သေးပါ။</p>
+  </div>
+
+  <div id="textTab" style="display:none">
+    <textarea id="directText" placeholder="မြန်မာစာကို ဒီနေရာမှာ ထည့်ပါ..."></textarea>
+  </div>
+</section>
+
+<!-- SCRIPT -->
+<section class="card">
+  <h2>📝 မြန်မာ Narration စာသား</h2>
+  <textarea id="script" placeholder="Video အတွက် မြန်မာအသံပြောမယ့် စာသားကို ထည့်ပါ...
+
+ဥပမာ -
+မင်္ဂလာပါ။ ဒီနေ့မှာတော့ စိတ်ဝင်စားစရာကောင်းတဲ့ အကြောင်းအရာတစ်ခုကို ပြောပြပေးသွားမှာ ဖြစ်ပါတယ်။"></textarea>
+  <div class="hint">မြန်မာစာထည့်ထားရင် transcription / translation မလုပ်ဘဲ ဒီစာကို အသံထုတ်ရန် အသုံးပြုပါမယ်။</div>
+</section>
+
+<!-- OPTIONS -->
+<section class="card">
+  <details>
+    <summary>⚙️ အပိုရွေးချယ်စရာ</summary>
+
+    <div class="control">
+      <label><span>မူရင်းဘာသာ</span><b>Auto Detect</b></label>
+    </div>
+
+    <div class="control">
+      <label><span>Target</span><b>မြန်မာ</b></label>
+    </div>
+
+    <div class="control">
+      <label><span>အသံပုံစံ</span></label>
+      <select style="width:100%;padding:13px;border:1px solid var(--line);border-radius:12px;font-family:inherit">
+        <option>သဘာဝကျကျ</option>
+        <option>ရုပ်ရှင် / ဇာတ်လမ်း</option>
+        <option>Documentary</option>
+        <option>TikTok / Social</option>
+        <option>ရိုးရိုးရှင်းရှင်း</option>
+      </select>
+    </div>
+  </details>
+</section>
+
+<!-- VOICES -->
+<section class="card">
+  <h2>🗣️ မြန်မာ Narrator ရွေးပါ</h2>
+
+  <div class="narrators">
+
+    <div class="voice selected" onclick="selectVoice(this,'မောင်မင်း')">
+      <div class="avatar">👨</div>
+      <b>မောင်မင်း</b>
+      <span>ယောကျာ်း • သဘာဝ</span>
+      <button onclick="sample(event,'မောင်မင်း')">▶ နမူနာ</button>
+    </div>
+
+    <div class="voice" onclick="selectVoice(this,'ကိုထက်')">
+      <div class="avatar">👨‍💼</div>
+      <b>ကိုထက်</b>
+      <span>ယောကျာ်း • တည်ငြိမ်</span>
+      <button onclick="sample(event,'ကိုထက်')">▶ နမူနာ</button>
+    </div>
+
+    <div class="voice" onclick="selectVoice(this,'ကိုဇော်')">
+      <div class="avatar">🧔</div>
+      <b>ကိုဇော်</b>
+      <span>ယောကျာ်း • နက်ရှိုင်း</span>
+      <button onclick="sample(event,'ကိုဇော်')">▶ နမူနာ</button>
+    </div>
+
+    <div class="voice" onclick="selectVoice(this,'မင်းခန့်')">
+      <div class="avatar">👦</div>
+      <b>မင်းခန့်</b>
+      <span>ယောကျာ်း • လူငယ်</span>
+      <button onclick="sample(event,'မင်းခန့်')">▶ နမူနာ</button>
+    </div>
+
+    <div class="voice" onclick="selectVoice(this,'မေသူ')">
+      <div class="avatar">👩</div>
+      <b>မေသူ</b>
+      <span>မိန်းမ • နူးညံ့</span>
+      <button onclick="sample(event,'မေသူ')">▶ နမူနာ</button>
+    </div>
+
+    <div class="voice" onclick="selectVoice(this,'သီရိ')">
+      <div class="avatar">👩‍💼</div>
+      <b>သီရိ</b>
+      <span>မိန်းမ • တည်ငြိမ်</span>
+      <button onclick="sample(event,'သီရိ')">▶ နမူနာ</button>
+    </div>
+
+    <div class="voice" onclick="selectVoice(this,'ခင်မြတ်')">
+      <div class="avatar">👩</div>
+      <b>ခင်မြတ်</b>
+      <span>မိန်းမ • Documentary</span>
+      <button onclick="sample(event,'ခင်မြတ်')">▶ နမူနာ</button>
+    </div>
+
+    <div class="voice" onclick="selectVoice(this,'ဖြူစင်')">
+      <div class="avatar">👧</div>
+      <b>ဖြူစင်</b>
+      <span>မိန်းမ • လူငယ်</span>
+      <button onclick="sample(event,'ဖြူစင်')">▶ နမူနာ</button>
+    </div>
+
+  </div>
+</section>
+
+<!-- CONTROLS -->
+<section class="card">
+  <details>
+    <summary>🎛️ Voice Controls</summary>
+
+    <div class="control">
+      <label><span>Speed</span><b id="speedValue">Auto</b></label>
+      <input type="range" min="70" max="130" value="100"
+        oninput="speedValue.textContent=this.value+'%'">
+    </div>
+
+    <div class="control">
+      <label><span>Pitch</span><b>Auto</b></label>
+      <input type="range" min="70" max="130" value="100">
+    </div>
+
+    <div class="control">
+      <label><span>Volume</span><b>Auto</b></label>
+      <input type="range" min="0" max="100" value="100">
+    </div>
+
+    <label style="display:flex;gap:10px;align-items:center">
+      <input type="checkbox" checked>
+      Auto Sync
+    </label>
+  </details>
+</section>
+
+<!-- ACTION -->
+<div class="sticky">
+  <button class="primary" onclick="createNarration()">
+    🚀 မြန်မာအသံ ဖန်တီးမည်
+  </button>
+</div>
+
+<!-- PROCESS -->
+<section class="card progressbox" id="processing">
+  <h2>⏳ အသံဖန်တီးနေပါတယ်</h2>
+
+  <div class="progress">
+    <div class="progressbar" id="bar"></div>
+  </div>
+
+  <p id="percent">0%</p>
+
+  <ul class="steps">
+    <li>✓ Video အသံကို ဖတ်နေသည်</li>
+    <li>✓ Speech-to-Text</li>
+    <li>✓ မြန်မာဘာသာပြန်ခြင်း</li>
+    <li>✓ Narration Script ပြင်ဆင်ခြင်း</li>
+    <li>✓ Myanmar TTS</li>
+    <li>✓ Timing / Auto Sync</li>
+    <li>✓ WAV / MP3 ပြုလုပ်ခြင်း</li>
+    <li>✓ Result ပြင်ဆင်ခြင်း</li>
+  </ul>
+</section>
+
+<!-- RESULT -->
+<section class="card result" id="result">
+  <div class="success">✅ အသံဖန်တီးပြီးပါပြီ</div>
+
+  <p>ရွေးထားသော Narrator — <b id="chosenVoice">မောင်မင်း</b></p>
+
+  <audio id="resultAudio" controls style="width:100%;margin:10px 0"></audio>
+
+  <div class="downloads">
+    <button class="download" onclick="downloadText()">⬇ MP3</button>
+    <button class="download" onclick="downloadText()">⬇ WAV</button>
+  </div>
+
+  <button class="download" style="width:100%;margin-top:10px">
+    🎞️ MP4 Download
+  </button>
+
+  <div class="status" id="status"></div>
+
+  <button class="secondary" style="width:100%;margin-top:12px" onclick="location.reload()">
+    🔄 Start Again
+  </button>
+</section>
+
+</div>
+
+<script>
+let selectedVoice="မောင်မင်း";
+let videoObjectUrl=null;
+
+function tab(name,btn){
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+  btn.classList.add("active");
+
+  document.getElementById("fileTab").style.display=name==="file"?"block":"none";
+  document.getElementById("urlTab").style.display=name==="url"?"block":"none";
+  document.getElementById("textTab").style.display=name==="text"?"block":"none";
+}
+
+document.getElementById("videoFile").addEventListener("change",function(){
+  const file=this.files[0];
+  if(!file)return;
+
+  if(!file.type.startsWith("video/")){
+    alert("ဒီဖိုင်က Video မဟုတ်ပါ။");
+    return;
+  }
+
+  if(videoObjectUrl)URL.revokeObjectURL(videoObjectUrl);
+
+  videoObjectUrl=URL.createObjectURL(file);
+
+  const video=document.getElementById("video");
+  video.src=videoObjectUrl;
+
+  document.getElementById("videoPreview").style.display="block";
+  document.getElementById("fileName").textContent=file.name;
+  document.getElementById("fileSize").textContent=formatBytes(file.size);
+});
+
+function formatBytes(bytes){
+  if(bytes<1024*1024)return (bytes/1024).toFixed(1)+" KB";
+  return (bytes/1024/1024).toFixed(1)+" MB";
+}
+
+function removeVideo(){
+  document.getElementById("videoFile").value="";
+  document.getElementById("video").removeAttribute("src");
+  document.getElementById("videoPreview").style.display="none";
+}
+
+function selectVoice(el,name){
+  document.querySelectorAll(".voice").forEach(v=>v.classList.remove("selected"));
+  el.classList.add("selected");
+  selectedVoice=name;
+}
+
+function sample(event,name){
+  event.stopPropagation();
+
+  const text="မင်္ဂလာပါ။ ဒီဟာက "+name+" ရဲ့ မြန်မာအသံ နမူနာ ဖြစ်ပါတယ်။";
+
+  if("speechSynthesis" in window){
+    speechSynthesis.cancel();
+
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang="my-MM";
+    u.rate=0.9;
+    u.pitch=1;
+
+    speechSynthesis.speak(u);
+  }else{
+    alert("ဒီ Browser မှာ အသံနမူနာစနစ် မထောက်ပံ့ပါ။");
+  }
+}
+
+function createNarration(){
+
+  const text=document.getElementById("script").value.trim();
+
+  if(!text){
+    alert("မြန်မာ Narration စာသားကို အရင်ထည့်ပါ။");
+    document.getElementById("script").focus();
+    return;
+  }
+
+  document.getElementById("processing").style.display="block";
+  document.getElementById("result").style.display="none";
+
+  let p=0;
+
+  const timer=setInterval(()=>{
+
+    p+=10;
+
+    document.getElementById("bar").style.width=p+"%";
+    document.getElementById("percent").textContent=p+"%";
+
+    if(p>=100){
+      clearInterval(timer);
+
+      document.getElementById("processing").style.display="none";
+      document.getElementById("result").style.display="block";
+      document.getElementById("chosenVoice").textContent=selectedVoice;
+
+      makeBrowserAudio(text);
+    }
+
+  },300);
+}
+
+function makeBrowserAudio(text){
+
+  if(!("speechSynthesis" in window)){
+    document.getElementById("status").style.display="block";
+    document.getElementById("status").textContent=
+      "Browser မှာ Text-to-Speech မရရှိသေးပါ။ AI TTS ကို နောက်အဆင့်မှာ ချိတ်ပါမယ်။";
+    return;
+  }
+
+  document.getElementById("status").style.display="block";
+  document.getElementById("status").textContent=
+    "Demo mode ဖြစ်ပါတယ်။ နောက်အဆင့်မှာ Real AI Myanmar TTS ကို ချိတ်ပါမယ်။";
+
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang="my-MM";
+  u.rate=0.9;
+
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+
+function downloadText(){
+  const text=document.getElementById("script").value;
+
+  if(!text){
+    alert("Narration စာသားမရှိသေးပါ။");
+    return;
+  }
+
+  const blob=new Blob([text],{type:"text/plain;charset=utf-8"});
+  const url=URL.createObjectURL(blob);
+
+  const a=document.createElement("a");
+  a.href=url;
+  a.download="myanmar-narration.txt";
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+</script>
+
+</body>
+    </html>
